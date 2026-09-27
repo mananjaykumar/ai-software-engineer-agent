@@ -38,6 +38,10 @@ dependencies = [
     
     # Sandboxing & Tooling
     "docker>=7.1.0",
+
+    # GitHub App & JWT
+    "pyjwt[crypto]>=2.8.0",
+
 ]
 
 [project.optional-dependencies]

@@ -24,6 +24,13 @@ class Settings(BaseSettings):
     # 4. LLM API Key (Protected Secret)
     OPENAI_API_KEY: SecretStr = SecretStr("mock_key_for_dev")
 
+    # 5. GitHub Integration Settings
+    GITHUB_WEBHOOK_SECRET: SecretStr = SecretStr("mock_webhook_secret_for_dev")
+    GITHUB_APP_ID: str = "mock_app_id"
+    GITHUB_PRIVATE_KEY: SecretStr = SecretStr("mock_private_key_for_dev")
+
+
+
     @property
     def async_database_url(self) -> str:
         return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
