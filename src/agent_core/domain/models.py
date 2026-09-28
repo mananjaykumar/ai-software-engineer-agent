@@ -21,6 +21,9 @@ class Repository(BaseEntity):
     chunks: Mapped[list["CodeChunk"]] = relationship(
         "CodeChunk", back_populates="repository", cascade="all, delete-orphan"
     )
+    approval_requests: Mapped[list["ApprovalRequest"]] = relationship(
+        "ApprovalRequest", back_populates="repository", cascade="all, delete-orphan"
+    )
 
 
 class CodeChunk(BaseEntity):
@@ -60,5 +63,36 @@ class CodeSymbol(BaseEntity):
     scope_path: Mapped[str | None] = mapped_column(String(512), nullable=True)
     signature: Mapped[str | None] = mapped_column(Text, nullable=True)
     docstring: Mapped[str | None] = mapped_column(Text, nullable=True)
+
     # Relationship
     chunk: Mapped["CodeChunk"] = relationship("CodeChunk", back_populates="symbols")
+
+
+class ApprovalRequest(BaseEntity):
+    __tablename__ = "approval_requests"
+
+    repo_id: Mapped[uuid.UUID] = mapped_column(
+        PG_UUID(as_uuid=True),
+        ForeignKey("repositories.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
+    thread_id: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
+    issue_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    title: Mapped[str] = mapped_column(String(512), nullable=False)
+    base_commit_sha: Mapped[str] = mapped_column(String(40), nullable=False)
+    target_branch: Mapped[str] = mapped_column(String(100), default="main", nullable=False)
+    feature_branch: Mapped[str] = mapped_column(String(255), nullable=False)
+    remediation_plan: Mapped[str] = mapped_column(Text, nullable=False)
+    patch_diff: Mapped[str] = mapped_column(Text, nullable=False)
+    test_summary: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(String(50), default="pending", index=True, nullable=False)
+    reviewer: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    rejection_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    pr_number: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    pr_url: Mapped[str | None] = mapped_column(String(1024), nullable=True)
+
+    # Relationship
+    repository: Mapped["Repository"] = relationship(
+        "Repository", back_populates="approval_requests"
+    )
