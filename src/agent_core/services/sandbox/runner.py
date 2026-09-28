@@ -14,13 +14,19 @@ class DockerSandboxRunner(BaseSandboxRunner):
         self,
         manager: DockerSandboxManager | None = None,
         workspace_files: dict[str, str] | None = None,
+        test_command: list[str] | str | None = None,
     ) -> None:
         self.manager = manager or DockerSandboxManager()
         self.workspace_files = workspace_files or {}
+        self.test_command = test_command
 
     def set_workspace_files(self, files: dict[str, str]) -> None:
         """Sets or refreshes base repository workspace files."""
         self.workspace_files = dict(files)
+
+    def set_test_command(self, command: list[str] | str | None) -> None:
+        """Sets or updates the test runner command."""
+        self.test_command = command
 
     async def run_verification(
         self,
@@ -32,4 +38,5 @@ class DockerSandboxRunner(BaseSandboxRunner):
         return await self.manager.run_in_sandbox(
             base_files=self.workspace_files,
             patches=patches,
+            command=self.test_command,
         )
